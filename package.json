@@ -1,0 +1,24 @@
+{
+  "name": "semantic-release-cargo",
+  "version": "0.0.0-development",
+  "description": "semantic release plugin to deploy crates to cargo.io (or other registries)",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test"
+  },
+  "author": "Christoph Bühler",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "semantic-release": "^19.0.3",
+    "sinon": "^14.0.0"
+  },
+  "dependencies": {
+    "@semantic-release/error": "^3.0.0",
+    "execa": "^6.1.0"
+  },
+  "release": {
+    "branches": [
+      "main"
+    ]
+  }
+}
