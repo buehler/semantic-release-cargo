@@ -1,6 +1,7 @@
 # semantic release cargo
 
 Semantic release plugin to publish cargo packages.
+Login with a cargo.io registry token and publish your crate.
 
 ## Configuration
 
@@ -10,4 +11,24 @@ Semantic release plugin to publish cargo packages.
 
 ### Options
 
-- `publishArgs`: "String" that contains additional arguments to pass to `cargo publish`
+- `check`: Boolean that defines if `cargo check` is executed (defaults to `true`)
+- `checkArgs`: Array of strings that contains additional arguments for `cargo check`
+- `publishArgs`: Array of strings that contains additional arguments for `cargo publish`
+
+#### Full Configuration Example
+
+```jsonc
+// .releaserc.json example
+{
+  "plugins": [
+    [
+      "semantic-release-cargo",
+      {
+        "check": true,
+        "checkArgs": ["--all-features"],
+        "publishArgs": ["--no-verify"]
+      }
+    ]
+  ]
+}
+```
