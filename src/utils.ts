@@ -1,4 +1,4 @@
-export const cargoExecutable = (executable?: string) => (executable ?? process.platform === 'win32' ? 'cargo.exe' : 'cargo');
+export const cargoExecutable = (executable?: string) => executable ?? (process.platform === 'win32' ? 'cargo.exe' : 'cargo');
 
 export type PluginConfig = {
   executable?: string;

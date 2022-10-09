@@ -7,6 +7,7 @@ import { cargoExecutable, PluginConfig, SemanticReleaseError } from './utils';
  */
 export default async ({ executable }: PluginConfig, { env, logger }: Context) => {
   const { execa } = await import('execa');
+
   try {
     const { stdout } = await execa(cargoExecutable(executable), ['--version']);
     logger.info(`Cargo version: ${stdout}`);
