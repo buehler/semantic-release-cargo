@@ -10,14 +10,13 @@
     "prebuild": "rimraf dist",
     "build": "tsc -p tsconfig.build.json",
     "build:test": "rimraf dist && tsc",
-    "test": "node --loader=esmock --test"
+    "test": "node --test"
   },
   "author": "Christoph Bühler",
   "license": "Apache-2.0",
   "devDependencies": {
     "@types/semantic-release": "17.2.4",
     "@types/sinon": "^10.0.13",
-    "esmock": "^2.0.5",
     "rimraf": "3.0.2",
     "semantic-release": "19.0.5",
     "sinon": "14.0.1",
