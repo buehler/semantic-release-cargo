@@ -1,26 +1,16 @@
-const SemanticReleaseError = require('@semantic-release/error');
-const { constants } = require('fs');
-const { access } = require('fs/promises');
-const { cargoExecutable } = require('./utils');
-
-/**
- * @typedef {Object} PluginConfig
- * @property {string?} executable the executable that shall be called.
- */
+import { execa } from 'execa';
+import { access, constants } from 'node:fs/promises';
+import { Context } from 'semantic-release';
+import { cargoExecutable, PluginConfig, SemanticReleaseError } from './utils.js';
 
 /**
  * Checks if all necessary elements are in place.
- *
- * @param {PluginConfig} pluginConfig
- * @param {import('semantic-release').Context} context
  */
-module.exports = async ({ executable }, { env, logger }) => {
-  const { execa } = await import('execa');
-
+export default async ({ executable }: PluginConfig, { env, logger }: Context) => {
   try {
     const { stdout } = await execa(cargoExecutable(executable), ['--version']);
     logger.info(`Cargo version: ${stdout}`);
-  } catch (e) {
+  } catch (e: any) {
     logger.error(e);
     throw new SemanticReleaseError(
       `Cargo executable (${cargoExecutable(executable)}) not valid.`,
@@ -47,7 +37,7 @@ module.exports = async ({ executable }, { env, logger }) => {
 
   try {
     await access('./Cargo.toml', constants.R_OK);
-  } catch (e) {
+  } catch (e: any) {
     logger.error('Could not access Cargo.toml');
     throw new SemanticReleaseError('Could not access Cargo.toml', 'ECARGOTOML', e.message);
   }

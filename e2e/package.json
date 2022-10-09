@@ -1,0 +1,14 @@
+{
+  "name": "e2e",
+  "private": true,
+  "scripts": {
+    "test": "semantic-release -p 'semantic-release-cargo' -d -b *"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "semantic-release": "^19.0.5",
+    "semantic-release-cargo": "file:.."
+  }
+}
