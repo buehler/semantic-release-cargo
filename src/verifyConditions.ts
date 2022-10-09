@@ -1,12 +1,12 @@
-import { execa } from 'execa';
 import { access, constants } from 'node:fs/promises';
 import { Context } from 'semantic-release';
-import { cargoExecutable, PluginConfig, SemanticReleaseError } from './utils.js';
+import { cargoExecutable, PluginConfig, SemanticReleaseError } from './utils';
 
 /**
  * Checks if all necessary elements are in place.
  */
 export default async ({ executable }: PluginConfig, { env, logger }: Context) => {
+  const { execa } = await import('execa');
   try {
     const { stdout } = await execa(cargoExecutable(executable), ['--version']);
     logger.info(`Cargo version: ${stdout}`);

@@ -1,9 +1,8 @@
 import { rejects } from 'node:assert/strict';
 import { unlink, writeFile } from 'node:fs/promises';
-import test from 'node:test';
 import { Context } from 'semantic-release';
 import { stub } from 'sinon';
-import verifyConditions from '../src/verifyConditions.js';
+import verifyConditions from '../src/verifyConditions';
 
 const context = (env = {}) =>
   ({

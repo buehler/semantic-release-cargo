@@ -1,13 +1,6 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
-export default {
-  // [...]
-  extensionsToTreatAsEsm: ['.ts'],
-  moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.js$': '$1',
-  },
+module.exports = {
   transform: {
-    // '^.+\\.[tj]sx?$' to process js/ts with `ts-jest`
-    // '^.+\\.m?[tj]sx?$' to process js/ts/mjs/mts with `ts-jest`
     '^.+\\.tsx?$': [
       'ts-jest',
       {
@@ -15,4 +8,6 @@ export default {
       },
     ],
   },
+
+  preset: 'ts-jest/presets/js-with-ts-esm',
 };

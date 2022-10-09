@@ -1,5 +1,5 @@
-import prepare from './prepare.js';
-import publish from './publish.js';
-import verifyConditions from './verifyConditions.js';
+import prepare from './prepare';
+import publish from './publish';
+import verifyConditions from './verifyConditions';
 
 export { prepare, publish, verifyConditions };
