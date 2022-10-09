@@ -9,7 +9,7 @@
   "author": "Christoph Bühler",
   "license": "Apache-2.0",
   "devDependencies": {
-    "semantic-release": "19.0.3",
+    "semantic-release": "19.0.5",
     "sinon": "14.0.1"
   },
   "dependencies": {
