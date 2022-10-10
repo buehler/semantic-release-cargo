@@ -1,0 +1,9 @@
+node_modules/
+e2e/
+.github/
+src/
+test/
+tsconfig*
+renovate.json
+.gitignore
+.npmignore

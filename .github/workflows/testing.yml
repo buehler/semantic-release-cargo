@@ -1,0 +1,19 @@
+name: Test package
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  lint_and_test:
+    name: Testing
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm ci
+      - run: npm run build:test
+      - run: npm test
