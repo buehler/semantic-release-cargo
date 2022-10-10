@@ -7,7 +7,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
+  "devDependencies": {
     "semantic-release": "^19.0.5",
     "semantic-release-cargo": "file:.."
   }
