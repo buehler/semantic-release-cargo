@@ -1,15 +1,13 @@
 import { access, constants } from 'node:fs/promises';
 import { Context } from 'semantic-release';
-import { cargoExecutable, PluginConfig, SemanticReleaseError } from './utils';
+import { cargoExecutable, exec, PluginConfig, SemanticReleaseError } from './utils';
 
 /**
  * Checks if all necessary elements are in place.
  */
 export default async ({ executable }: PluginConfig, { env, logger }: Context) => {
-  const { execa } = await import('execa');
-
   try {
-    const { stdout } = await execa(cargoExecutable(executable), ['--version']);
+    const { stdout } = await exec(cargoExecutable(executable), ['--version']);
     logger.info(`Cargo version: ${stdout}`);
   } catch (e: any) {
     logger.error(e);
@@ -30,7 +28,7 @@ export default async ({ executable }: PluginConfig, { env, logger }: Context) =>
   }
 
   logger.info(`Login into crates.io`);
-  const { exitCode, stderr } = await execa(cargoExecutable(executable), ['login', env['CARGO_REGISTRY_TOKEN']]);
+  const { exitCode, stderr } = await exec(cargoExecutable(executable), ['login', env['CARGO_REGISTRY_TOKEN']]);
   if (exitCode !== 0) {
     logger.error('Could not log into the crate registry');
     throw new SemanticReleaseError('Could not log into the crate registry', 'ECARGOAUTH', stderr);

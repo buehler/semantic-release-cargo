@@ -1,5 +1,11 @@
 export const cargoExecutable = (executable?: string) => executable ?? (process.platform === 'win32' ? 'cargo.exe' : 'cargo');
 
+export async function exec(executable: string, args: string[] = []) {
+  const { execa } = await import('execa');
+  const { stdout, stderr, exitCode } = await execa(cargoExecutable(executable), args);
+  return { stdout, stderr, exitCode };
+}
+
 export type PluginConfig = {
   executable?: string;
   allFeatures?: boolean;
