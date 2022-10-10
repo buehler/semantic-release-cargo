@@ -36,6 +36,7 @@ export default async ({ executable }: PluginConfig, { env, logger }: Context) =>
 
   try {
     await access('./Cargo.toml', constants.R_OK);
+    await access('./Cargo.toml', constants.W_OK);
   } catch (e: any) {
     logger.error('Could not access Cargo.toml');
     throw new SemanticReleaseError('Could not access Cargo.toml', 'ECARGOTOML', e.message);

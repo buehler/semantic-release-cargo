@@ -1,6 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { Context } from 'semantic-release';
-import { cargoExecutable, PluginConfig, SemanticReleaseError } from './utils';
+import { cargoExecutable, exec, PluginConfig, SemanticReleaseError } from './utils';
 
 /**
  * Prepare the package for release (perform "cargo check" and set version number).
@@ -9,8 +9,6 @@ export default async (
   { executable, allFeatures = false, check = true, checkArgs = [] }: PluginConfig,
   { logger, nextRelease }: Context
 ) => {
-  const { execa } = await import('execa');
-
   logger.info(`Write new release version (${nextRelease?.version}) into Cargo.toml.`);
   const tomlContent = await readFile('./Cargo.toml', 'utf8');
   await writeFile(
@@ -25,7 +23,7 @@ export default async (
       checkArgs.push('--all-features');
     }
 
-    const { stderr, exitCode } = await execa(cargoExecutable(executable), ['check', ...checkArgs]);
+    const { stderr, exitCode } = await exec(cargoExecutable(executable), ['check', ...checkArgs]);
     if (exitCode !== 0) {
       throw new SemanticReleaseError('Cargo check failed', 'ECARGOCHECK', stderr);
     }
