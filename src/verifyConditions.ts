@@ -1,26 +1,15 @@
-const SemanticReleaseError = require('@semantic-release/error');
-const { constants } = require('fs');
-const { access } = require('fs/promises');
-const { cargoExecutable } = require('./utils');
-
-/**
- * @typedef {Object} PluginConfig
- * @property {string?} executable the executable that shall be called.
- */
+import { access, constants } from 'node:fs/promises';
+import { Context } from 'semantic-release';
+import { cargoExecutable, exec, PluginConfig, SemanticReleaseError } from './utils';
 
 /**
  * Checks if all necessary elements are in place.
- *
- * @param {PluginConfig} pluginConfig
- * @param {import('semantic-release').Context} context
  */
-module.exports = async ({ executable }, { env, logger }) => {
-  const { execa } = await import('execa');
-
+export default async ({ executable }: PluginConfig, { env, logger }: Context) => {
   try {
-    const { stdout } = await execa(cargoExecutable(executable), ['--version']);
+    const { stdout } = await exec(cargoExecutable(executable), ['--version']);
     logger.info(`Cargo version: ${stdout}`);
-  } catch (e) {
+  } catch (e: any) {
     logger.error(e);
     throw new SemanticReleaseError(
       `Cargo executable (${cargoExecutable(executable)}) not valid.`,
@@ -39,7 +28,7 @@ module.exports = async ({ executable }, { env, logger }) => {
   }
 
   logger.info(`Login into crates.io`);
-  const { exitCode, stderr } = await execa(cargoExecutable(executable), ['login', env['CARGO_REGISTRY_TOKEN']]);
+  const { exitCode, stderr } = await exec(cargoExecutable(executable), ['login', env['CARGO_REGISTRY_TOKEN']]);
   if (exitCode !== 0) {
     logger.error('Could not log into the crate registry');
     throw new SemanticReleaseError('Could not log into the crate registry', 'ECARGOAUTH', stderr);
@@ -47,7 +36,8 @@ module.exports = async ({ executable }, { env, logger }) => {
 
   try {
     await access('./Cargo.toml', constants.R_OK);
-  } catch (e) {
+    await access('./Cargo.toml', constants.W_OK);
+  } catch (e: any) {
     logger.error('Could not access Cargo.toml');
     throw new SemanticReleaseError('Could not access Cargo.toml', 'ECARGOTOML', e.message);
   }

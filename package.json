@@ -2,19 +2,31 @@
   "name": "semantic-release-cargo",
   "version": "0.0.0-development",
   "description": "semantic release plugin to deploy crates to cargo.io (or other registries)",
-  "main": "index.js",
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "dev": "tsc -w",
+    "prebuild": "rimraf dist",
+    "build": "tsc -p tsconfig.build.json",
+    "build:test": "rimraf dist && tsc",
     "test": "node --test"
   },
   "author": "Christoph Bühler",
   "license": "Apache-2.0",
   "devDependencies": {
+    "@types/node": "^18.8.3",
+    "@types/semantic-release": "17.2.4",
+    "@types/sinon": "^10.0.13",
+    "rewiremock": "^3.14.3",
+    "rimraf": "3.0.2",
     "semantic-release": "19.0.5",
-    "sinon": "14.0.1"
+    "sinon": "14.0.1",
+    "ts-jest": "^29.0.3",
+    "typescript": "4.8.4"
   },
   "dependencies": {
-    "@semantic-release/error": "^3.0.0",
-    "execa": "^6.1.0"
+    "execa": "6.1.0"
   },
   "release": {
     "branches": [
