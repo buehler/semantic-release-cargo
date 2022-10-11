@@ -1,4 +1,5 @@
-import { access, constants } from 'node:fs/promises';
+import { constants } from 'fs';
+import { access } from 'fs/promises';
 import { Context } from 'semantic-release';
 import { cargoExecutable, exec, PluginConfig, SemanticReleaseError } from './utils';
 
