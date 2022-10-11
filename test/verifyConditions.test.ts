@@ -64,7 +64,7 @@ test('throws on no read access to cargo file', async () => {
       exec: stub().onFirstCall().resolves({ stdout: 'cargo 1.0.0' }).onSecondCall().resolves({ exitCode: 0 }),
     })
     .callThrough();
-  rewiremock<typeof import('node:fs/promises')>(() => require('node:fs/promises'))
+  rewiremock<typeof import('fs/promises')>(() => require('fs/promises'))
     .with({
       access: stub().withArgs('./Cargo.toml', constants.R_OK).rejects({}),
     })
@@ -81,7 +81,7 @@ test('throws on no write access to cargo file', async () => {
       exec: stub().onFirstCall().resolves({ stdout: 'cargo 1.0.0' }).onSecondCall().resolves({ exitCode: 0 }),
     })
     .callThrough();
-  rewiremock<typeof import('node:fs/promises')>(() => require('node:fs/promises'))
+  rewiremock<typeof import('fs/promises')>(() => require('fs/promises'))
     .with({
       access: stub().resolves().withArgs('./Cargo.toml', constants.W_OK).rejects({}),
     })
@@ -98,7 +98,7 @@ test('successfully checks conditions', async () => {
       exec: stub().onFirstCall().resolves({ stdout: 'cargo 1.0.0' }).onSecondCall().resolves({ exitCode: 0 }),
     })
     .callThrough();
-  rewiremock<typeof import('node:fs/promises')>(() => require('node:fs/promises'))
+  rewiremock<typeof import('fs/promises')>(() => require('fs/promises'))
     .with({
       access: stub().resolves(),
     })

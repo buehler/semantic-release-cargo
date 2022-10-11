@@ -22,7 +22,7 @@ afterEach(() => {
 
 test('writes new relesae version into Cargo.toml', async () => {
   const write = stub().resolves();
-  rewiremock<typeof import('node:fs/promises')>(() => require('node:fs/promises')).with({
+  rewiremock<typeof import('fs/promises')>(() => require('fs/promises')).with({
     readFile: stub().resolves('version = "0.0.0"'),
     writeFile: write,
   });
@@ -36,7 +36,7 @@ test('writes new relesae version into Cargo.toml', async () => {
 });
 
 test('performs cargo check if default', async () => {
-  rewiremock<typeof import('node:fs/promises')>(() => require('node:fs/promises')).with({
+  rewiremock<typeof import('fs/promises')>(() => require('fs/promises')).with({
     readFile: stub().resolves('version = "0.0.0"'),
     writeFile: stub().resolves(),
   });
@@ -56,7 +56,7 @@ test('performs cargo check if default', async () => {
 });
 
 test('does not performs cargo check if configured false', async () => {
-  rewiremock<typeof import('node:fs/promises')>(() => require('node:fs/promises')).with({
+  rewiremock<typeof import('fs/promises')>(() => require('fs/promises')).with({
     readFile: stub().resolves('version = "0.0.0"'),
     writeFile: stub().resolves(),
   });
@@ -76,7 +76,7 @@ test('does not performs cargo check if configured false', async () => {
 });
 
 test('performs cargo check if configured true', async () => {
-  rewiremock<typeof import('node:fs/promises')>(() => require('node:fs/promises')).with({
+  rewiremock<typeof import('fs/promises')>(() => require('fs/promises')).with({
     readFile: stub().resolves('version = "0.0.0"'),
     writeFile: stub().resolves(),
   });
@@ -96,7 +96,7 @@ test('performs cargo check if configured true', async () => {
 });
 
 test('throws if cargo check is not successful', async () => {
-  rewiremock<typeof import('node:fs/promises')>(() => require('node:fs/promises')).with({
+  rewiremock<typeof import('fs/promises')>(() => require('fs/promises')).with({
     readFile: stub().resolves('version = "0.0.0"'),
     writeFile: stub().resolves(),
   });
@@ -114,7 +114,7 @@ test('throws if cargo check is not successful', async () => {
 });
 
 test('attaches --all-features if configured', async () => {
-  rewiremock<typeof import('node:fs/promises')>(() => require('node:fs/promises')).with({
+  rewiremock<typeof import('fs/promises')>(() => require('fs/promises')).with({
     readFile: stub().resolves('version = "0.0.0"'),
     writeFile: stub().resolves(),
   });
@@ -136,7 +136,7 @@ test('attaches --all-features if configured', async () => {
 });
 
 test('attaches additional check args', async () => {
-  rewiremock<typeof import('node:fs/promises')>(() => require('node:fs/promises')).with({
+  rewiremock<typeof import('fs/promises')>(() => require('fs/promises')).with({
     readFile: stub().resolves('version = "0.0.0"'),
     writeFile: stub().resolves(),
   });
