@@ -19,7 +19,7 @@
     "@types/semantic-release": "17.2.5",
     "@types/sinon": "10.0.13",
     "rewiremock": "3.14.4",
-    "rimraf": "4.0.7",
+    "rimraf": "4.1.0",
     "semantic-release": "20.0.2",
     "sinon": "15.0.1",
     "ts-jest": "29.0.5",
