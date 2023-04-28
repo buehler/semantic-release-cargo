@@ -8,7 +8,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "semantic-release": "21.0.1",
+    "semantic-release": "21.0.2",
     "semantic-release-cargo": "file:.."
   }
 }
