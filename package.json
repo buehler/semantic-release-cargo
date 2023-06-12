@@ -21,7 +21,7 @@
     "rewiremock": "3.14.5",
     "rimraf": "5.0.1",
     "semantic-release": "21.0.5",
-    "sinon": "15.1.0",
+    "sinon": "15.1.2",
     "ts-jest": "29.1.0",
     "typescript": "5.1.3"
   },
