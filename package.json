@@ -16,7 +16,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@types/node": "18.18.6",
-    "@types/semantic-release": "17.2.7",
+    "@types/semantic-release": "17.2.9",
     "@types/sinon": "10.0.19",
     "rewiremock": "3.14.5",
     "rimraf": "5.0.5",
