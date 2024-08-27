@@ -1,0 +1,17 @@
+{
+  "name": "semantic-release-cargo",
+  "version": "0.0.0-development",
+  "description": "semantic release plugin to deploy crates to cargo.io (or other registries)",
+  "author": "Christoph Bühler",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "dist/Program.js",
+  "keywords": [
+    "semantic-release",
+    "cargo",
+    "rust"
+  ],
+  "scripts": {
+    "dev": "dotnet fable watch -o dist"
+  }
+}
