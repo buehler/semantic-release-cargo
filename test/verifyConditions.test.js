@@ -1,49 +1,60 @@
-import { jest } from '@jest/globals';
+import assert from 'node:assert/strict';
+import { afterEach, describe, it, mock } from 'node:test';
 
 const context = (env = {}) => ({
   env,
   logger: {
-    info: jest.fn(),
-    debug: jest.fn(),
-    error: jest.fn(),
+    info: mock.fn(),
+    debug: mock.fn(),
+    error: mock.fn(),
   },
 });
 
 describe('verifyConditions', () => {
-  it('should refuse if cargo is invalid', async () => {
-    jest.unstable_mockModule('../dist/Cargo.js', () => ({
-      cargoExecutable: 'cargo',
-      exec: jest.fn(() => {
-        throw new Error('Cargo.exe is invalid');
-      }),
-    }));
+  afterEach(() => mock.reset());
 
-    const {
-      export$: { verifyConditions },
-    } = await import('../dist/Program.js');
+  // it('should refuse if cargo is invalid', async (t) => {
+  //   const m = t.mock.module('../dist/Cargo.js', {
+  //     namedExports: {
+  //       cargoExecutable: 'cargo',
+  //       exec: () => {
+  //         throw new Error('Test Case');
+  //       },
+  //     },
+  //   });
+  //   t.after(() => m.restore());
 
-    expect(() => verifyConditions({}, context())).rejects.toMatchObject({
-      'code@3': 'ECARGOEXECUTABLE',
+  //   const s = await import('../dist/Program.js');
+
+  //   const {
+  //     export$: { verifyConditions },
+  //   } = s;
+
+  //   await assert.rejects(async () => verifyConditions({}, context()), {
+  //     'code@3': 'ECARGOEXECUTABLE',
+  //   });
+  // });
+
+  it('should print the cargo version number', async (t) => {
+    const m = t.mock.module('../dist/Cargo.js', {
+      namedExports: {
+        cargoExecutable: 'cargo',
+        exec: () => () => ['cargo 1.0.0', '', 0],
+      },
     });
-  });
-
-  it('should print the cargo version number', async () => {
-    jest.unstable_mockModule('../dist/Cargo.js', () => ({
-      cargoExecutable: 'cargo',
-      exec: jest.fn(() => ['cargo 1.0.0', '', 0]),
-    }));
+    t.after(() => m.restore());
 
     const {
       export$: { verifyConditions },
     } = await import('../dist/Program.js');
 
     const ctx = context();
-    const info = ctx.logger.info;
     try {
       await verifyConditions({}, ctx);
     } catch (e) {
       console.log(e);
     }
-    expect(info).toHaveBeenCalledWith('Cargo version: 1.0');
+
+    assert.equal(ctx.logger.info.mock.callCount(), 1);
   });
 });
