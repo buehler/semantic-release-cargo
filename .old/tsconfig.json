@@ -14,5 +14,11 @@
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"]
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts",
+    "test/verifyConditions.test.ts.asdf",
+    "test/publish.test.ts.asdf",
+    "test/prepare.test.ts.asdf"
+  ]
 }

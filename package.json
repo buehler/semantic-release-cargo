@@ -18,9 +18,12 @@
     "dev": "dotnet fable watch src/ -o dist",
     "build": "rm -rf dist && dotnet fable src/ -o dist --optimize",
     "pretest": "npm run build",
-    "test": ""
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "dependencies": {
     "execa": "^9.3.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
   }
 }
