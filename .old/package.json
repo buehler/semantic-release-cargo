@@ -15,12 +15,12 @@
   "author": "Christoph Bühler",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@types/node": "20.16.5",
-    "@types/semantic-release": "17.2.11",
+    "@types/node": "20.16.1",
+    "@types/semantic-release": "^20.0.6",
     "@types/sinon": "17.0.3",
     "rewiremock": "3.14.5",
     "rimraf": "6.0.1",
-    "semantic-release": "21.1.0",
+    "semantic-release": "^24.1.0",
     "sinon": "18.0.0",
     "ts-jest": "29.2.5",
     "typescript": "5.1.6"

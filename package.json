@@ -6,12 +6,21 @@
   "license": "Apache-2.0",
   "type": "module",
   "main": "dist/Program.js",
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "semantic-release",
     "cargo",
     "rust"
   ],
   "scripts": {
-    "dev": "dotnet fable watch -o dist"
+    "dev": "dotnet fable watch src/ -o dist",
+    "build": "rm -rf dist && dotnet fable src/ -o dist --optimize",
+    "pretest": "npm run build",
+    "test": ""
+  },
+  "dependencies": {
+    "execa": "^9.3.1"
   }
 }
