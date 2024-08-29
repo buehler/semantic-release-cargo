@@ -16,8 +16,7 @@
   ],
   "scripts": {
     "dev": "dotnet fable watch src/ -o dist",
-    "build": "rm -rf dist && dotnet fable src/ -o dist --optimize",
-    "test": "node --test --experimental-test-module-mocks"
+    "build": "rm -rf dist && dotnet fable src/ -o dist --optimize"
   },
   "dependencies": {
     "execa": "^9.3.1"

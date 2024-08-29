@@ -1,26 +1,23 @@
 module SemanticReleaseCargo.VerifyConditions
 
-open Fable.Core
 open SemanticReleaseCargo.Config
 open SemanticReleaseCargo.Errors
+open SemanticReleaseCargo.ExternalApi
 open SemanticReleaseCargo.SemanticRelease
 
-[<Import("access", "fs/promises")>]
-let private access (_: string) (_: double) : Async<unit> = jsNative |> Async.AwaitPromise
-
-let verifyConditions (_: PluginConfig) (context: VerifyReleaseContext) =
+let verifyConditions (api: IExternalApi) (_: PluginConfig) (context: VerifyReleaseContext) =
     async {
         context.logger.debug "Check cargo executable and cargo version."
 
         try
-            let! out, _, _ = Cargo.exec [| "--version" |]
+            let! out, _, _ = api.exec [| "--version" |]
             context.logger.info $"Cargo version: {out}"
         with ex ->
             context.logger.error $"Failed to check cargo version: {ex.Message}"
 
             raise (
                 SemanticReleaseError(
-                    $"Cargo executable ({Cargo.cargoExecutable}) not valid.",
+                    $"Cargo executable ({api.cargoExecutable}) not valid.",
                     "ECARGOEXECUTABLE",
                     Some(ex.Message)
                 )
@@ -31,15 +28,15 @@ let verifyConditions (_: PluginConfig) (context: VerifyReleaseContext) =
             raise (SemanticReleaseError("CARGO_REGISTRY_TOKEN is not set.", "ENOREGISTRYTOKEN", None))
 
         context.logger.info "Login into registry."
-        let! _, err, exit = Cargo.exec [| "login"; context.env["CARGO_REGISTRY_TOKEN"] |]
+        let! _, err, exit = api.exec [| "login"; context.env["CARGO_REGISTRY_TOKEN"] |]
 
         if exit <> 0 then
             context.logger.error $"Failed to login into registry: {err}"
             raise (SemanticReleaseError("Failed to login into registry.", "ELOGIN", Some(err)))
 
         try
-            do! access "./Cargo.toml" Node.Api.fs.constants.R_OK
-            do! access "./Cargo.toml" Node.Api.fs.constants.W_OK
+            do! api.isReadable "./Cargo.toml"
+            do! api.isWritable "./Cargo.toml"
         with ex ->
             context.logger.error "Could not access Cargo.toml file."
             raise (SemanticReleaseError("Could not access Cargo.toml file.", "EACCESS", Some(ex.Message)))

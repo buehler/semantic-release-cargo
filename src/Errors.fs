@@ -8,8 +8,16 @@ type SemanticReleaseError(message: string, code: string, details: string option)
 
     interface Node.Base.Error with
         member _.message = message
-        member _.message with set _ = ()
+
+        member _.message
+            with set _ = ()
+
         member _.name = "SemanticReleaseError"
-        member _.name with set _ = ()
+
+        member _.name
+            with set _ = ()
+
         member _.stack = "N/A FABLE JS"
-        member _.stack with set _ = ()
+
+        member _.stack
+            with set _ = ()
