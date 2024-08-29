@@ -1,9 +1,6 @@
-using Microsoft.FSharp.Collections;
-using Microsoft.FSharp.Control;
 using Microsoft.FSharp.Core;
 using Moq;
 using SemanticReleaseCargo;
-using SemanticReleaseCargoTests;
 
 namespace SemanticReleaseCargoTests;
 
@@ -60,17 +57,134 @@ public class VerifyConditionsTests
     [Fact]
     public async Task ExecutesLoginIntoRegistry()
     {
-        var (ctx, log) = Context();
+        var (ctx, log) = Context(new()
+        {
+            {"CARGO_REGISTRY_TOKEN", "token"},
+        });
         var api = new Mock<ExternalApi.IExternalApi>();
 
         api
-            .Setup(a => a.exec(It.IsAny<string[]>()))
+            .Setup(a => a.exec(new[] {"--version"}))
             .Returns(new Tuple<string, string, int>("cargo 1.0.0", "", 0).AsAsync());
+
+        api
+            .Setup(a => a.exec(new[] {"login", "token"}))
+            .Returns(new Tuple<string, string, int>("", "", 1).AsAsync());
+
+        await Assert.ThrowsAsync<Errors.SemanticReleaseError>(
+            () => VerifyConditions.verifyConditions(api.Object, Config(), ctx.Object).Run());
+
+        api.Verify(a => a.exec(new[] {"login", "token"}), Times.Once);
+    }
+
+    [Fact]
+    public async Task ThrowsOnInvalidLoginIntoRegistry()
+    {
+        var (ctx, log) = Context(new()
+        {
+            {"CARGO_REGISTRY_TOKEN", "token"},
+        });
+        var api = new Mock<ExternalApi.IExternalApi>();
+
+        api
+            .Setup(a => a.exec(new[] {"--version"}))
+            .Returns(new Tuple<string, string, int>("cargo 1.0.0", "", 0).AsAsync());
+
+        api
+            .Setup(a => a.exec(new[] {"login", "token"}))
+            .Returns(new Tuple<string, string, int>("", "ERROR", 1).AsAsync());
 
         var ex = await Assert.ThrowsAsync<Errors.SemanticReleaseError>(
             () => VerifyConditions.verifyConditions(api.Object, Config(), ctx.Object).Run());
 
-        Assert.Equal("CARGO_REGISTRY_TOKEN is not set.", ex.Message);
+        Assert.Equal("Failed to login into registry.", ex.Message);
+        Assert.Equal("ERROR", ex.details.Value);
+    }
+
+    [Fact]
+    public async Task ThrowsOnNonReadableCargoFile()
+    {
+        var (ctx, log) = Context(new()
+        {
+            {"CARGO_REGISTRY_TOKEN", "token"},
+        });
+        var api = new Mock<ExternalApi.IExternalApi>();
+
+        api
+            .Setup(a => a.exec(new[] {"--version"}))
+            .Returns(new Tuple<string, string, int>("cargo 1.0.0", "", 0).AsAsync());
+
+        api
+            .Setup(a => a.exec(new[] {"login", "token"}))
+            .Returns(new Tuple<string, string, int>("", "", 0).AsAsync());
+
+        api
+            .Setup(a => a.isReadable(It.IsAny<string>()))
+            .Throws<Exception>();
+
+        var ex = await Assert.ThrowsAsync<Errors.SemanticReleaseError>(
+            () => VerifyConditions.verifyConditions(api.Object, Config(), ctx.Object).Run());
+
+        Assert.Equal("Could not access Cargo.toml file.", ex.Message);
+    }
+    
+    [Fact]
+    public async Task ThrowsOnNonWritableCargoFile()
+    {
+        var (ctx, log) = Context(new()
+        {
+            {"CARGO_REGISTRY_TOKEN", "token"},
+        });
+        var api = new Mock<ExternalApi.IExternalApi>();
+
+        api
+            .Setup(a => a.exec(new[] {"--version"}))
+            .Returns(new Tuple<string, string, int>("cargo 1.0.0", "", 0).AsAsync());
+
+        api
+            .Setup(a => a.exec(new[] {"login", "token"}))
+            .Returns(new Tuple<string, string, int>("", "", 0).AsAsync());
+
+        api
+            .Setup(a => a.isReadable(It.IsAny<string>()))
+            .Returns(Helpers.UnitAsync);
+        
+        api
+            .Setup(a => a.isWritable(It.IsAny<string>()))
+            .Throws<Exception>();
+
+        var ex = await Assert.ThrowsAsync<Errors.SemanticReleaseError>(
+            () => VerifyConditions.verifyConditions(api.Object, Config(), ctx.Object).Run());
+
+        Assert.Equal("Could not access Cargo.toml file.", ex.Message);
+    }
+    
+    [Fact]
+    public async Task SuccessfullyTerminates()
+    {
+        var (ctx, log) = Context(new()
+        {
+            {"CARGO_REGISTRY_TOKEN", "token"},
+        });
+        var api = new Mock<ExternalApi.IExternalApi>();
+
+        api
+            .Setup(a => a.exec(new[] {"--version"}))
+            .Returns(new Tuple<string, string, int>("cargo 1.0.0", "", 0).AsAsync());
+
+        api
+            .Setup(a => a.exec(new[] {"login", "token"}))
+            .Returns(new Tuple<string, string, int>("", "", 0).AsAsync());
+
+        api
+            .Setup(a => a.isReadable(It.IsAny<string>()))
+            .Returns(Helpers.UnitAsync);
+        
+        api
+            .Setup(a => a.isWritable(It.IsAny<string>()))
+            .Returns(Helpers.UnitAsync);
+
+        await VerifyConditions.verifyConditions(api.Object, Config(), ctx.Object).Run();
     }
 
     private static Config.PluginConfig Config() => new Mock<Config.PluginConfig>().Object;
