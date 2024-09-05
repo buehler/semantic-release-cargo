@@ -14,6 +14,7 @@
         <Compile Include="Errors.fs"/>
         <Compile Include="VerifyConditions.fs"/>
         <Compile Include="Prepare.fs"/>
+        <Compile Include="Publish.fs" />
         <Compile Include="Program.fs"/>
     </ItemGroup>
 

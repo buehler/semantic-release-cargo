@@ -6,6 +6,8 @@ type IExternalApi =
     interface
         abstract isReadable: string -> Async<unit>
         abstract isWritable: string -> Async<unit>
+        abstract readFile: string -> Async<string>
+        abstract writeFile: string -> string -> Async<unit>
         abstract cargoExecutable: string
         abstract exec: string array -> ExecResult
     end
@@ -33,13 +35,25 @@ module NodeApi =
     [<Import("access", "fs/promises")>]
     let private access (_: string) (_: double) : JS.Promise<unit> = jsNative
 
+    [<Import("readFile", "fs/promises")>]
+    let private readFile (_: string) (_: string) : JS.Promise<string> = jsNative
+
+    [<Import("writeFile", "fs/promises")>]
+    let private writeFile (_: string) (_: string) (_: string) : JS.Promise<unit> = jsNative
+
     type private Api() =
         interface IExternalApi with
             member this.isReadable path =
                 access path Node.Api.fs.constants.R_OK |> Async.AwaitPromise
 
+            member this.readFile path =
+                readFile path "utf8" |> Async.AwaitPromise
+
             member this.isWritable path =
                 access path Node.Api.fs.constants.W_OK |> Async.AwaitPromise
+
+            member this.writeFile path content =
+                writeFile path content "utf8" |> Async.AwaitPromise
 
             member this.cargoExecutable =
                 match Node.Api.``process``.platform with
