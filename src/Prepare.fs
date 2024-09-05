@@ -6,7 +6,8 @@ open SemanticReleaseCargo.Errors
 open SemanticReleaseCargo.ExternalApi
 open SemanticReleaseCargo.SemanticRelease
 
-let private versionRegex = Regex(@"^version\s*=\s*(.*)", RegexOptions.ECMAScript)
+let private versionRegex =
+    Regex(@"^version\s*=\s*(.*)", RegexOptions.ECMAScript ||| RegexOptions.Multiline)
 
 let prepare (api: IExternalApi) (config: PluginConfig) (context: PrepareContext) =
     async {
@@ -34,8 +35,6 @@ let prepare (api: IExternalApi) (config: PluginConfig) (context: PrepareContext)
             if exit <> 0 then
                 context.logger.error $"Cargo check failed: {err}"
                 raise (SemanticReleaseError("Cargo check failed.", "ECARGOCHECK", Some(err)))
-
-            ()
 
         ()
     }
