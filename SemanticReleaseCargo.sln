@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "SemanticReleaseCargo", "src\SemanticReleaseCargo.fsproj", "{B6DDEBC0-A09F-4D92-8495-27FBFEAC4553}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticReleaseCargoTests", "test\SemanticReleaseCargoTests\SemanticReleaseCargoTests.csproj", "{D339D7A8-E631-4856-BB13-130BCC708668}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B6DDEBC0-A09F-4D92-8495-27FBFEAC4553}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6DDEBC0-A09F-4D92-8495-27FBFEAC4553}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6DDEBC0-A09F-4D92-8495-27FBFEAC4553}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6DDEBC0-A09F-4D92-8495-27FBFEAC4553}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D339D7A8-E631-4856-BB13-130BCC708668}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D339D7A8-E631-4856-BB13-130BCC708668}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D339D7A8-E631-4856-BB13-130BCC708668}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D339D7A8-E631-4856-BB13-130BCC708668}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
