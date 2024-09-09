@@ -25,6 +25,7 @@ jobs:
         with:
           dotnet-version: 8.x
 
+      - run: dotnet tool restore
       - run: dotnet test
       - run: npm ci
       - run: npm run build
