@@ -22,7 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\SemanticReleaseCargo.fsproj" />
+      <ProjectReference Include="..\src\SemanticReleaseCargo.fsproj" />
     </ItemGroup>
 
 </Project>

@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "SemanticReleaseCargo", "src\SemanticReleaseCargo.fsproj", "{B6DDEBC0-A09F-4D92-8495-27FBFEAC4553}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticReleaseCargoTests", "test\SemanticReleaseCargoTests\SemanticReleaseCargoTests.csproj", "{D339D7A8-E631-4856-BB13-130BCC708668}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticReleaseCargoTests", "test\SemanticReleaseCargoTests.csproj", "{D339D7A8-E631-4856-BB13-130BCC708668}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
