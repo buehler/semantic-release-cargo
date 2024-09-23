@@ -4,6 +4,7 @@ open SemanticReleaseCargo.Config
 open SemanticReleaseCargo.Errors
 open SemanticReleaseCargo.ExternalApi
 open SemanticReleaseCargo.SemanticRelease
+open SemanticReleaseCargo.Utils
 
 let verifyConditions (api: IExternalApi) (_: PluginConfig) (context: VerifyReleaseContext) =
     async {
@@ -23,12 +24,12 @@ let verifyConditions (api: IExternalApi) (_: PluginConfig) (context: VerifyRelea
                 )
             )
 
-        if not (context.env.ContainsKey "CARGO_REGISTRY_TOKEN") then
+        if not (mapContainsKey context.env "CARGO_REGISTRY_TOKEN") then
             context.logger.error "CARGO_REGISTRY_TOKEN is not set"
             raise (SemanticReleaseError("CARGO_REGISTRY_TOKEN is not set.", "ENOREGISTRYTOKEN", None))
 
         context.logger.info "Login into registry."
-        let! _, err, exit = api.exec [| "login"; context.env["CARGO_REGISTRY_TOKEN"] |]
+        let! _, err, exit = api.exec [| "login"; mapGetKey context.env "CARGO_REGISTRY_TOKEN" |]
 
         if exit <> 0 then
             context.logger.error $"Failed to login into registry: {err}"
