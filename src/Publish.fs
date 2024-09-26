@@ -8,7 +8,7 @@ open SemanticReleaseCargo.SemanticRelease
 
 let publish (api: IExternalApi) (config: PluginConfig) (context: Context) =
     async {
-        if not ((false, config.publish) ||> Option.defaultValue) then
+        if not ((true, config.publish) ||> Option.defaultValue) then
             context.logger.warn "Publish set to 'false'. Skip publishing."
         else
             context.logger.info "Publish cargo crate."
