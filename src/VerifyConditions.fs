@@ -6,7 +6,7 @@ open SemanticReleaseCargo.ExternalApi
 open SemanticReleaseCargo.SemanticRelease
 open SemanticReleaseCargo.Utils
 
-let verifyConditions (api: IExternalApi) (_: PluginConfig) (context: VerifyReleaseContext) =
+let verifyConditions (api: IExternalApi) (config: PluginConfig) (context: VerifyReleaseContext) =
     async {
         context.logger.debug "Check cargo executable and cargo version."
 
@@ -24,16 +24,21 @@ let verifyConditions (api: IExternalApi) (_: PluginConfig) (context: VerifyRelea
                 )
             )
 
-        if not (mapContainsKey context.env "CARGO_REGISTRY_TOKEN") then
-            context.logger.error "CARGO_REGISTRY_TOKEN is not set"
-            raise (SemanticReleaseError("CARGO_REGISTRY_TOKEN is not set.", "ENOREGISTRYTOKEN", None))
+        // Skip token verification if not publishing and verification explicitly disabled
+        if not ((true, config.publish) ||> Option.defaultValue) &&
+           not ((true, config.alwaysVerifyToken) ||> Option.defaultValue) then
+            context.logger.warn "Publish and alwaysVerifyToken set to 'false'. Skip CARGO_REGISTRY_TOKEN verification."
+        else
+            if not (mapContainsKey context.env "CARGO_REGISTRY_TOKEN") then
+                context.logger.error "CARGO_REGISTRY_TOKEN is not set"
+                raise (SemanticReleaseError("CARGO_REGISTRY_TOKEN is not set.", "ENOREGISTRYTOKEN", None))
 
-        context.logger.info "Login into registry."
-        let! _, err, exit = api.exec [| "login"; mapGetKey context.env "CARGO_REGISTRY_TOKEN" |]
+            context.logger.info "Login into registry."
+            let! _, err, exit = api.exec [| "login"; mapGetKey context.env "CARGO_REGISTRY_TOKEN" |]
 
-        if exit <> 0 then
-            context.logger.error $"Failed to login into registry: {err}"
-            raise (SemanticReleaseError("Failed to login into registry.", "ELOGIN", Some(err)))
+            if exit <> 0 then
+                context.logger.error $"Failed to login into registry: {err}"
+                raise (SemanticReleaseError("Failed to login into registry.", "ELOGIN", Some(err)))
 
         try
             do! api.isReadable "./Cargo.toml"
