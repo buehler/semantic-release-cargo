@@ -84,6 +84,12 @@ public class VerifyConditionsTests
         api
             .Setup(a => a.exec(It.IsAny<string[]>()))
             .Returns(new Tuple<string, string, int>("cargo 1.0.0", "", 0).AsAsync);
+        api
+            .Setup(a => a.isReadable(It.IsAny<string>()))
+            .Returns(Helpers.UnitAsync);
+        api
+            .Setup(a => a.isWritable(It.IsAny<string>()))
+            .Returns(Helpers.UnitAsync);
 
         await VerifyConditions.verifyConditions(api.Object, config.Object, ctx.Object).Run();
     }
