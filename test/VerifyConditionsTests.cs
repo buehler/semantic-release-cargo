@@ -55,6 +55,46 @@ public class VerifyConditionsTests
     }
 
     [Fact]
+    public async Task ThrowsWhenNoRegistryTokenIsPresentAndNotPublishing()
+    {
+        var (ctx, log) = Context();
+        var api = new Mock<ExternalApi.IExternalApi>();
+        var config = new Mock<Config.PluginConfig>();
+        config.Setup(c => c.publish).Returns(false);
+
+        api
+            .Setup(a => a.exec(It.IsAny<string[]>()))
+            .Returns(new Tuple<string, string, int>("cargo 1.0.0", "", 0).AsAsync);
+
+        var ex = await Assert.ThrowsAsync<Errors.SemanticReleaseError>(
+            () => VerifyConditions.verifyConditions(api.Object, Config(), ctx.Object).Run());
+
+        Assert.Equal("CARGO_REGISTRY_TOKEN is not set.", ex.Message);
+    }
+
+    [Fact]
+    public async Task AllowsNoRegistryTokenIfNotPublishingAndCheckDisabled()
+    {
+        var (ctx, log) = Context();
+        var api = new Mock<ExternalApi.IExternalApi>();
+        var config = new Mock<Config.PluginConfig>();
+        config.Setup(c => c.publish).Returns(false);
+        config.Setup(c => c.alwaysVerifyToken).Returns(false);
+
+        api
+            .Setup(a => a.exec(It.IsAny<string[]>()))
+            .Returns(new Tuple<string, string, int>("cargo 1.0.0", "", 0).AsAsync);
+        api
+            .Setup(a => a.isReadable(It.IsAny<string>()))
+            .Returns(Helpers.UnitAsync);
+        api
+            .Setup(a => a.isWritable(It.IsAny<string>()))
+            .Returns(Helpers.UnitAsync);
+
+        await VerifyConditions.verifyConditions(api.Object, config.Object, ctx.Object).Run();
+    }
+
+    [Fact]
     public async Task ExecutesLoginIntoRegistry()
     {
         var (ctx, log) = Context(new()
