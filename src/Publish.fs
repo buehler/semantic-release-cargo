@@ -18,7 +18,7 @@ let publish (api: IExternalApi) (config: PluginConfig) (context: Context) =
             let allFeatures = (false, config.allFeatures) ||> Option.defaultValue
 
             let args =
-                match (Array.contains "--all-features" args, allFeatures) with
+                match Array.contains "--all-features" args, allFeatures with
                 | false, true -> Array.append args [| "--all-features" |]
                 | _ -> args
 
@@ -34,7 +34,7 @@ let publish (api: IExternalApi) (config: PluginConfig) (context: Context) =
 
             if exit <> 0 then
                 context.logger.error $"Cargo publish failed: {err}"
-                raise (SemanticReleaseError("Cargo publish failed.", "ECARGOPUBLISH", Some(err)))
+                raise (SemanticReleaseError("Cargo publish failed.", "ECARGOPUBLISH", Some err))
 
         ()
     }

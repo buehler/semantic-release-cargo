@@ -21,7 +21,7 @@ let verifyConditions (api: IExternalApi) (config: PluginConfig) (context: Verify
                 SemanticReleaseError(
                     $"Cargo executable ({api.cargoExecutable}) not valid.",
                     "ECARGOEXECUTABLE",
-                    Some(ex.Message)
+                    Some ex.Message
                 )
             )
 
@@ -39,7 +39,7 @@ let verifyConditions (api: IExternalApi) (config: PluginConfig) (context: Verify
 
             if exit <> 0 then
                 context.logger.error $"Failed to login into registry: {err}"
-                raise (SemanticReleaseError("Failed to login into registry.", "ELOGIN", Some(err)))
+                raise (SemanticReleaseError("Failed to login into registry.", "ELOGIN", Some err))
 
         let checkManifest crate = async {
             let path = composeManifestPath crate

@@ -37,7 +37,7 @@ let prepare (api: IExternalApi) (config: PluginConfig) (context: PrepareContext)
             let allFeatures = (false, config.allFeatures) ||> Option.defaultValue
 
             let args =
-                match (Array.contains "--all-features" args, allFeatures) with
+                match Array.contains "--all-features" args, allFeatures with
                 | false, true -> Array.append args [| "--all-features" |]
                 | _ -> args
 
@@ -45,7 +45,7 @@ let prepare (api: IExternalApi) (config: PluginConfig) (context: PrepareContext)
 
             if exit <> 0 then
                 context.logger.error $"Cargo check failed: {err}"
-                raise (SemanticReleaseError("Cargo check failed.", "ECARGOCHECK", Some(err)))
+                raise (SemanticReleaseError("Cargo check failed.", "ECARGOCHECK", Some err))
 
         ()
     }
