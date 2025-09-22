@@ -167,7 +167,7 @@ public class VerifyConditionsTests
 
         Assert.Equal("Could not access ./Cargo.toml file.", ex.Message);
     }
-    
+
     [Fact]
     public async Task ThrowsOnNonWritableCargoFile()
     {
@@ -188,7 +188,7 @@ public class VerifyConditionsTests
         api
             .Setup(a => a.isReadable(It.IsAny<string>()))
             .Returns(Helpers.UnitAsync);
-        
+
         api
             .Setup(a => a.isWritable(It.IsAny<string>()))
             .Throws<Exception>();
@@ -198,7 +198,7 @@ public class VerifyConditionsTests
 
         Assert.Equal("Could not access ./Cargo.toml file.", ex.Message);
     }
-    
+
     [Fact]
     public async Task SuccessfullyTerminates()
     {
@@ -219,7 +219,7 @@ public class VerifyConditionsTests
         api
             .Setup(a => a.isReadable(It.IsAny<string>()))
             .Returns(Helpers.UnitAsync);
-        
+
         api
             .Setup(a => a.isWritable(It.IsAny<string>()))
             .Returns(Helpers.UnitAsync);
