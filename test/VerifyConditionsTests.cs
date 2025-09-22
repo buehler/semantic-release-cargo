@@ -165,7 +165,7 @@ public class VerifyConditionsTests
         var ex = await Assert.ThrowsAsync<Errors.SemanticReleaseError>(
             () => VerifyConditions.verifyConditions(api.Object, Config(), ctx.Object).Run());
 
-        Assert.Equal("Could not access Cargo.toml file.", ex.Message);
+        Assert.Equal("Could not access ./Cargo.toml file.", ex.Message);
     }
     
     [Fact]
@@ -196,7 +196,7 @@ public class VerifyConditionsTests
         var ex = await Assert.ThrowsAsync<Errors.SemanticReleaseError>(
             () => VerifyConditions.verifyConditions(api.Object, Config(), ctx.Object).Run());
 
-        Assert.Equal("Could not access Cargo.toml file.", ex.Message);
+        Assert.Equal("Could not access ./Cargo.toml file.", ex.Message);
     }
     
     [Fact]
@@ -225,6 +225,80 @@ public class VerifyConditionsTests
             .Returns(Helpers.UnitAsync);
 
         await VerifyConditions.verifyConditions(api.Object, Config(), ctx.Object).Run();
+        api.Verify(a => a.isReadable("./Cargo.toml"), Times.Once);
+        api.Verify(a => a.isWritable("./Cargo.toml"), Times.Once);
+    }
+
+    [Theory]
+    [InlineData([new[] {"project_1"}])]
+    [InlineData([new[] {"project_1", "project_2"}])]
+    [InlineData([new[] {"project_1", "project_2", "project_3"}])]
+    public async Task SuccessfullyTerminatesWithMultipleCrates(string[] crates)
+    {
+        var (ctx, log) = Context(new()
+        {
+            {"CARGO_REGISTRY_TOKEN", "token"},
+        });
+        var api = new Mock<ExternalApi.IExternalApi>();
+        var config = new Mock<Config.PluginConfig>();
+        config.Setup(c => c.crates).Returns(crates);
+
+        api
+            .Setup(a => a.exec(new[] {"--version"}))
+            .Returns(new Tuple<string, string, int>("cargo 1.0.0", "", 0).AsAsync());
+
+        api
+            .Setup(a => a.exec(new[] {"login", "token"}))
+            .Returns(new Tuple<string, string, int>("", "", 0).AsAsync());
+
+        api
+            .Setup(a => a.isReadable(It.IsAny<string>()))
+            .Returns(Helpers.UnitAsync);
+
+        api
+            .Setup(a => a.isWritable(It.IsAny<string>()))
+            .Returns(Helpers.UnitAsync);
+
+        await VerifyConditions.verifyConditions(api.Object, config.Object, ctx.Object).Run();
+
+        foreach (var crate in crates)
+        {
+            api.Verify(a => a.isReadable($"./{crate}/Cargo.toml"), Times.Once);
+            api.Verify(a => a.isWritable($"./{crate}/Cargo.toml"), Times.Once);
+        }
+    }
+
+    [Fact]
+    public async Task ThrowsWhenEmptyCratesArrayProvided()
+    {
+        var (ctx, log) = Context(new()
+        {
+            {"CARGO_REGISTRY_TOKEN", "token"},
+        });
+        var api = new Mock<ExternalApi.IExternalApi>();
+        var config = new Mock<Config.PluginConfig>();
+        config.Setup(c => c.crates).Returns(Array.Empty<string>());
+
+        api
+            .Setup(a => a.exec(new[] {"--version"}))
+            .Returns(new Tuple<string, string, int>("cargo 1.0.0", "", 0).AsAsync());
+
+        api
+            .Setup(a => a.exec(new[] {"login", "token"}))
+            .Returns(new Tuple<string, string, int>("", "", 0).AsAsync());
+
+        api
+            .Setup(a => a.isReadable(It.IsAny<string>()))
+            .Returns(Helpers.UnitAsync);
+
+        api
+            .Setup(a => a.isWritable(It.IsAny<string>()))
+            .Returns(Helpers.UnitAsync);
+
+        var ex = await Assert.ThrowsAsync<Errors.SemanticReleaseError>(
+            () => VerifyConditions.verifyConditions(api.Object, config.Object, ctx.Object).Run());
+
+        Assert.Equal("'crates' array should be non-empty, add at least one crate or remove this configuratoin option.", ex.Message);
     }
 
     private static Config.PluginConfig Config() => new Mock<Config.PluginConfig>().Object;

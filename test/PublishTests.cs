@@ -1,3 +1,4 @@
+using Microsoft.FSharp.Core;
 using Moq;
 using SemanticReleaseCargo;
 
@@ -67,7 +68,8 @@ public class PublishTests
         bool check = true,
         bool publish = true,
         List<string>? checkArgs = null,
-        List<string>? publishArgs = null)
+        List<string>? publishArgs = null,
+        List<string>? crates = null)
     {
         var config = new Mock<Config.PluginConfig>();
 
@@ -76,6 +78,7 @@ public class PublishTests
         config.Setup(c => c.publish).Returns(publish);
         config.Setup(c => c.checkArgs).Returns((checkArgs ?? []).ToArray());
         config.Setup(c => c.publishArgs).Returns((publishArgs ?? []).ToArray());
+        config.Setup(c => c.crates).Returns(crates?.ToArray() ?? FSharpOption<string[]>.None);
 
         return config;
     }

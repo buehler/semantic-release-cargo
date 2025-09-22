@@ -30,6 +30,45 @@ public class PrepareTests
         api.Verify(a => a.writeFile("./Cargo.toml", It.Is<string>(s => s.Contains("version = \"1.2.3\""))), Times.Once);
     }
 
+    [Theory]
+    [InlineData([new[] {"project_1"}])]
+    [InlineData([new[] {"project_1", "project_2"}])]
+    [InlineData([new[] {"project_1", "project_2", "project_3"}])]
+    public async Task WritesNewVersionIntoMultipleCargoFiles(string[] crates)
+    {
+        var ctx = Context();
+        var cfg = Config(check: false, crates: crates.ToList());
+        var api = new Mock<ExternalApi.IExternalApi>();
+
+        foreach (var crate in crates)
+        {
+            api
+                .Setup(a => a.readFile($"./{crate}/Cargo.toml"))
+                .Returns($"""
+                        FoobarCargo
+                        name = "{crate}"
+                        version = "0.1.0"
+                        Other stuff.
+                        """.AsAsync());
+            api
+                .Setup(a => a.writeFile($"./{crate}/Cargo.toml", It.IsAny<string>()))
+                .Returns(Helpers.UnitAsync);
+        }
+
+        await Prepare.prepare(api.Object, cfg.Object, ctx.Object).Run();
+
+        foreach (var crate in crates)
+        {
+            api.Verify(
+                a => a.writeFile(
+                        $"./{crate}/Cargo.toml",
+                        It.Is<string>(s => s.Contains("version = \"1.2.3\""))
+                    ),
+                Times.Once
+            );
+        }
+    }
+
     [Fact]
     public async Task DontPerformCheckIfDisabled()
     {
@@ -104,12 +143,112 @@ public class PrepareTests
         api.Verify(a => a.exec(expected), Times.Once);
     }
 
+    [Theory]
+    [InlineData(
+        false,
+        new[] {"project_1" },
+        new[] {"check", "-Z", "package-workspace", "--package", "project_1"})]
+    [InlineData(
+        true,
+        new[] {"project_1" },
+        new[] {"check", "-Z", "package-workspace", "--package", "project_1", "--all-features"})]
+    [InlineData(
+        false,
+        new[] {"project_1", "project_2"},
+        new[] {"check", "-Z", "package-workspace", "--package", "project_1", "--package", "project_2"})]
+    [InlineData(
+        true,
+        new[] {"project_1", "project_2"},
+        new[] {"check", "-Z", "package-workspace", "--package", "project_1", "--package", "project_2", "--all-features"})]
+    [InlineData(
+        false,
+        new[] {"project_1", "project_2", "project_3"},
+        new[] {"check", "-Z", "package-workspace", "--package", "project_1", "--package", "project_2", "--package", "project_3"})]
+    [InlineData(
+        true,
+        new[] {"project_1", "project_2", "project_3"},
+        new[] {"check", "-Z", "package-workspace", "--package", "project_1", "--package", "project_2", "--package", "project_3", "--all-features"})]
+    public async Task RunCargoCheckWithArgsWithMultipleCrates(bool allFeatures, string[] crates, string[] expected)
+    {
+        var ctx = Context();
+        var cfg = Config(allFeatures: allFeatures, crates: crates.ToList());
+        var api = new Mock<ExternalApi.IExternalApi>();
+
+        foreach (var crate in crates)
+        {
+            api
+                .Setup(a => a.readFile($"./{crate}/Cargo.toml"))
+                .Returns($"""
+                        FoobarCargo
+                        name = "{crate}"
+                        version = "0.1.0"
+                        Other stuff.
+                        """.AsAsync());
+            api
+                .Setup(a => a.writeFile($"./{crate}/Cargo.toml", It.IsAny<string>()))
+                .Returns(Helpers.UnitAsync);
+        }
+
+        api
+            .Setup(a => a.exec(It.IsAny<string[]>()))
+            .Returns(new Tuple<string, string, int>("", "", 0).AsAsync());
+
+        await Prepare.prepare(api.Object, cfg.Object, ctx.Object).Run();
+
+        api.Verify(a => a.exec(expected), Times.Once);
+    }
+
+    [Theory]
+    [InlineData(new[] {"project_1"}, new[] {"-p", "project_0"})]
+    [InlineData(new[] {"project_1"}, new[] {"--package", "project_0" })]
+    [InlineData(new[] {"project_1"}, new[] {"-Z", "package-workspace" })]
+    [InlineData(new[] {"project_1", "project_2"}, new[] {"-p", "project_0"})]
+    [InlineData(new[] {"project_1", "project_2"}, new[] {"--package", "project_0"})]
+    [InlineData(new[] {"project_1", "project_2"}, new[] {"-Z", "package-workspace"})]
+    [InlineData(new[] {"project_1", "project_2", "project_3"}, new[] {"-p", "project_0"})]
+    [InlineData(new[] {"project_1", "project_2", "project_3"}, new[] {"--package", "project_0"})]
+    [InlineData(new[] {"project_1", "project_2", "project_3"}, new[] {"-Z", "package-workspace"})]
+    public async Task ThrowsWhenRunCheckWithMultipleCratesAndProhibitedArgs(string[] crates, string[] args)
+    {
+        var ctx = Context();
+        var cfg = Config(crates: crates.ToList(), checkArgs: args.ToList());
+        var api = new Mock<ExternalApi.IExternalApi>();
+
+        foreach (var crate in crates)
+        {
+            api
+                .Setup(a => a.readFile($"./{crate}/Cargo.toml"))
+                .Returns($"""
+                        FoobarCargo
+                        name = "{crate}"
+                        version = "0.1.0"
+                        Other stuff.
+                        """.AsAsync());
+        }
+
+        foreach (var crate in crates)
+        {
+            api
+                .Setup(a => a.writeFile($"./{crate}/Cargo.toml", It.IsAny<string>()))
+                .Returns(Helpers.UnitAsync);
+        }
+
+        var ex = await Assert.ThrowsAsync<Errors.SemanticReleaseError>(
+            () => Prepare.prepare(api.Object, cfg.Object, ctx.Object).Run());
+
+        Assert.Equal(
+            $"'{string.Join(" ", args)}' flag is invalid to use with 'crates' configuration option.",
+            ex.Message
+        );
+    }
+
     private static Mock<Config.PluginConfig> Config(
         bool allFeatures = false,
         bool check = true,
         bool publish = true,
         List<string>? checkArgs = null,
-        List<string>? publishArgs = null)
+        List<string>? publishArgs = null,
+        List<string>? crates = null)
     {
         var config = new Mock<Config.PluginConfig>();
 
@@ -118,6 +257,7 @@ public class PrepareTests
         config.Setup(c => c.publish).Returns(publish);
         config.Setup(c => c.checkArgs).Returns((checkArgs ?? []).ToArray());
         config.Setup(c => c.publishArgs).Returns((publishArgs ?? []).ToArray());
+        config.Setup(c => c.crates).Returns(crates?.ToArray() ?? FSharpOption<string[]>.None);
 
         return config;
     }
