@@ -1,0 +1,19 @@
+name: kellnr-crate-registry
+services:
+  kellnr: # https://github.com/kellnr/kellnr
+    container_name: kellnr-service
+    image: ghcr.io/kellnr/kellnr-minimal:5.7.1-pre2
+    ports:
+      - $KELLNR_PORT:$KELLNR_PORT
+    # volumes: # Crates database persistence.
+    #   - kdata:/opt/kdata
+    environment:
+      KELLNR_SETUP__ADMIN_PWD: $KELLNR_ADMIN_PWD
+      KELLNR_SETUP__ADMIN_TOKEN: $KELLNR_ADMIN_TOKEN
+      KELLNR_LOCAL__PORT: $KELLNR_PORT
+      KELLNR_DOCS__ENABLED: true
+    healthcheck:
+      timeout: 10s
+      start_period: 5s
+# volumes:
+#   kdata:
