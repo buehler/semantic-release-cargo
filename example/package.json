@@ -1,0 +1,26 @@
+{
+  "type": "module",
+  "scripts": {
+    "start": "docker compose up --wait",
+    "stop": "docker compose down",
+
+    "config": "for o in tag commit; do git config set $o.gpgsign false; done",
+    "unconfig": "for o in tag commit;  do git config unset $o.gpgsign; done",
+
+    "commit": "git commit --allow-empty -m 'feat!: breaking'",
+    "uncommit": "git reset --soft HEAD^",
+
+    "untag": "tag=$(npm run -s head-tag) && git tag -d $tag && git push -d origin $tag",
+    "head-tag": "git describe --tags --abbrev=0 $(git rev-parse HEAD)",
+
+    "restore": "git restore **/Cargo.toml",
+
+    "release": "CARGO_REGISTRY_TOKEN=$(npm run -s token) semantic-release -e ./.releaserc.js --no-ci",
+    "token": ". ./.env && echo $KELLNR_ADMIN_TOKEN",
+
+    "check": "cnt=$(cargo search -q --registry kellnr project | wc -l) && [ $cnt -eq 2 ]"
+  },
+  "devDependencies": {
+    "semantic-release": "^24.2.8"
+  }
+}
