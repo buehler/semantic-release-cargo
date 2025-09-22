@@ -18,6 +18,9 @@ This is not required or verified if both the `publish` and `alwaysVerifyToken` o
 - `publish`: Boolean that defines if `cargo publish` is executed (defaults to `true`)
 - `publishArgs`: Array of strings that contains additional arguments for `cargo publish`
 - `alwaysVerifyToken`: Boolean that causes `CARGO_REGISTRY_TOKEN` verification to be skipped if both it and `publish` are `false` (defaults to `true`)
+- `crates`: Non-empty array of crate paths to publish inside [workspace], (default to `null`).
+
+[workspace]: https://doc.rust-lang.org/book/ch14-03-cargo-workspaces.html
 
 #### Full Configuration Example
 
@@ -32,7 +35,8 @@ This is not required or verified if both the `publish` and `alwaysVerifyToken` o
         "check": true,
         "checkArgs": ["--no-deps"],
         "publish": true,
-        "publishArgs": ["--no-verify"]
+        "publishArgs": ["--no-verify"],
+        "crates": ["project_1", "project_2"]
       }
     ]
   ]

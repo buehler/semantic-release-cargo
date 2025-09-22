@@ -13,6 +13,7 @@
         <Compile Include="SemanticRelease.fs"/>
         <Compile Include="PluginConfig.fs"/>
         <Compile Include="Errors.fs"/>
+        <Compile Include="Workspaces.fs"/>
         <Compile Include="VerifyConditions.fs"/>
         <Compile Include="Prepare.fs"/>
         <Compile Include="Publish.fs" />
