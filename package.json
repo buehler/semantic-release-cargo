@@ -18,7 +18,8 @@
     "dev": "dotnet fable watch src/ -o dist",
     "prebuild": "rm -rf dist",
     "build": "dotnet fable src/ -o dist --optimize",
-    "postbuild": "rm -rf dist/fable_modules/.gitignore"
+    "postbuild": "rm -rf dist/fable_modules/.gitignore",
+    "test": "cd example && ./run.sh"
   },
   "dependencies": {
     "execa": "^9.3.1"

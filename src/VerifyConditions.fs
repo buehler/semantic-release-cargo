@@ -5,6 +5,7 @@ open SemanticReleaseCargo.Errors
 open SemanticReleaseCargo.ExternalApi
 open SemanticReleaseCargo.SemanticRelease
 open SemanticReleaseCargo.Utils
+open SemanticReleaseCargo.Workspaces
 
 let verifyConditions (api: IExternalApi) (config: PluginConfig) (context: VerifyReleaseContext) =
     async {
@@ -20,7 +21,7 @@ let verifyConditions (api: IExternalApi) (config: PluginConfig) (context: Verify
                 SemanticReleaseError(
                     $"Cargo executable ({api.cargoExecutable}) not valid.",
                     "ECARGOEXECUTABLE",
-                    Some(ex.Message)
+                    Some ex.Message
                 )
             )
 
@@ -33,19 +34,44 @@ let verifyConditions (api: IExternalApi) (config: PluginConfig) (context: Verify
                 context.logger.error "CARGO_REGISTRY_TOKEN is not set"
                 raise (SemanticReleaseError("CARGO_REGISTRY_TOKEN is not set.", "ENOREGISTRYTOKEN", None))
 
+            let args = ([||], config.loginArgs) ||> Option.defaultValue
+
             context.logger.info "Login into registry."
-            let! _, err, exit = api.exec [| "login"; mapGetKey context.env "CARGO_REGISTRY_TOKEN" |]
+            let! _, err, exit = api.exec <| Array.concat [|
+                    [| "login" |]
+                    args
+                    [| mapGetKey context.env "CARGO_REGISTRY_TOKEN" |]
+                |]
 
             if exit <> 0 then
                 context.logger.error $"Failed to login into registry: {err}"
-                raise (SemanticReleaseError("Failed to login into registry.", "ELOGIN", Some(err)))
+                raise (SemanticReleaseError("Failed to login into registry.", "ELOGIN", Some err))
 
-        try
-            do! api.isReadable "./Cargo.toml"
-            do! api.isWritable "./Cargo.toml"
-        with ex ->
-            context.logger.error "Could not access Cargo.toml file."
-            raise (SemanticReleaseError("Could not access Cargo.toml file.", "EACCESS", Some(ex.Message)))
+        let checkManifest crate = async {
+            let path = composeManifestPath crate
+            try
+                do! api.isReadable path
+                do! api.isWritable path
+            with ex ->
+                context.logger.error $"Could not access {path} file."
+                raise (SemanticReleaseError($"Could not access {path} file.", "EACCESS", Some ex.Message))
+        }
+
+        runAsyncs <|
+            match config.crates with
+            | Some crates  ->
+                match crates with
+                | [||] ->
+                    context.logger.error "Empty 'crates' array specified."
+                    raise (
+                        SemanticReleaseError(
+                            "'crates' array should be non-empty, add at least one crate or remove this configuratoin option.",
+                            "EACCESS",
+                            None
+                        )
+                    )
+                | _ -> Array.map checkManifest crates
+            | None -> [| checkManifest "" |]
 
         ()
     }
