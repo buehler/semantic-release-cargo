@@ -67,7 +67,7 @@ public class VerifyConditionsTests
             .Returns(new Tuple<string, string, int>("cargo 1.0.0", "", 0).AsAsync);
 
         var ex = await Assert.ThrowsAsync<Errors.SemanticReleaseError>(
-            () => VerifyConditions.verifyConditions(api.Object, Config(), ctx.Object).Run());
+            () => VerifyConditions.verifyConditions(api.Object, config.Object, ctx.Object).Run());
 
         Assert.Equal("CARGO_REGISTRY_TOKEN is not set.", ex.Message);
     }
