@@ -33,8 +33,14 @@ let verifyConditions (api: IExternalApi) (config: PluginConfig) (context: Verify
                 context.logger.error "CARGO_REGISTRY_TOKEN is not set"
                 raise (SemanticReleaseError("CARGO_REGISTRY_TOKEN is not set.", "ENOREGISTRYTOKEN", None))
 
+            let args = ([||], config.loginArgs) ||> Option.defaultValue
+
             context.logger.info "Login into registry."
-            let! _, err, exit = api.exec [| "login"; mapGetKey context.env "CARGO_REGISTRY_TOKEN" |]
+            let! _, err, exit = api.exec <| Array.concat [|
+                    [| "login" |]
+                    args
+                    [| mapGetKey context.env "CARGO_REGISTRY_TOKEN" |]
+                |]
 
             if exit <> 0 then
                 context.logger.error $"Failed to login into registry: {err}"

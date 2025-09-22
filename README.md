@@ -12,6 +12,7 @@ This is not required or verified if both the `publish` and `alwaysVerifyToken` o
 
 ### Options
 
+- `loginArgs`: Array of strings that contains additional arguments for `cargo login`
 - `allFeatures`: Boolean that attaches `--all-features` to the cargo commands (defaults to `false`)
 - `check`: Boolean that defines if `cargo check` is executed (defaults to `true`)
 - `checkArgs`: Array of strings that contains additional arguments for `cargo check`
@@ -28,6 +29,7 @@ This is not required or verified if both the `publish` and `alwaysVerifyToken` o
     [
       "semantic-release-cargo",
       {
+        "loginArgs": ["--registry", "http://localhost:8000"],
         "allFeatures": true,
         "check": true,
         "checkArgs": ["--no-deps"],
