@@ -16,7 +16,7 @@ type Plugin =
 let export: Plugin =
     jsOptions<Plugin> (fun o ->
         o.verifyConditions <-
-            (fun config context -> verifyConditions NodeApi.api config context |> Async.StartAsPromise)
+            fun config context -> verifyConditions NodeApi.api config context |> Async.StartAsPromise
 
-        o.prepare <- (fun config context -> prepare NodeApi.api config context |> Async.StartAsPromise)
-        o.publish <- (fun config context -> publish NodeApi.api config context |> Async.StartAsPromise))
+        o.prepare <- fun config context -> prepare NodeApi.api config context |> Async.StartAsPromise
+        o.publish <- fun config context -> publish NodeApi.api config context |> Async.StartAsPromise)

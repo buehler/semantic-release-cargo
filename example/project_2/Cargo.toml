@@ -1,0 +1,9 @@
+[package]
+name = "project_2"
+description = "Second package."
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/octocat/project-2"
+version = "1.0.0"
+edition = "2021"
+rust-version = "1.56"
+publish = ["kellnr"]
