@@ -29,7 +29,7 @@ module NodeApi =
     let private callExeca executable args =
         async {
             let! result = execa (executable, args) |> Async.AwaitPromise
-            return (result.stdout, result.stderr, result.exitCode)
+            return result.stdout, result.stderr, result.exitCode
         }
 
     [<Import("access", "fs/promises")>]
