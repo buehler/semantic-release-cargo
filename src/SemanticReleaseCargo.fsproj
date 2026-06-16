@@ -20,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Fable.Core" Version="5.0.0"/>
+        <PackageReference Include="Fable.Core" Version="5.1.0"/>
         <PackageReference Include="Fable.Node" Version="1.6.0"/>
         <PackageReference Update="FSharp.Core" Version="11.0.101-preview5.26302.115"/>
     </ItemGroup>
